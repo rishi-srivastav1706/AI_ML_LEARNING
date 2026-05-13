@@ -90,6 +90,9 @@ SELECT * FROM customers as c
 RIGHT join orders as o
 ON c.customer_id = o.customer_id;
 
+DROP TABLE accounts;
+
+
 
 SELECT * FROM customers
 CROSS JOIN orders;
@@ -127,3 +130,53 @@ FROM
         GROUP BY customer_id
         
 	)AS summary;
+
+
+CREATE VIEW view1 AS 
+SELECT c.customer_id, c.name, o.order_id
+FROM  customers c 
+INNER JOIN orders o 
+ON c.customer_id = o.customer_id;
+
+SELECT * FROM view1;
+
+CREATE TABLE accounts(
+	id INT PRIMARY KEY AUTO_INCREMENT,
+    name VARCHAR(50),
+    balance DECIMAL(10, 2),
+    branch VARCHAR(50)
+);
+
+INSERT INTO accounts VALUES 
+(1,"Alice",500.00, "Mumbai"),
+(2,'Bob', 300.00,"Delhi"),
+(3, "Charlie",700, "Bangalore"),
+(4, "David", 1000.00,"Noida");
+
+SELECT * FROM accounts;
+
+CREATE INDEX idx_branch ON accounts(branch);
+
+SHOW INDEX FROM accounts;
+
+SELECT * FROM accounts 
+WHERE branch = "Mumbai";
+
+CREATE INDEX idx2 ON accounts(branch, balance);
+SHOW INDEX FROM accounts;
+
+
+DELIMITER $$
+CREATE PROCEDURE check_balance(IN acc_id INT, OUT bal DECIMAL(10,2))
+BEGIN
+	SELECT balance INTO bal
+    FROM accounts
+    WHERE id = acc_id;
+
+END $$
+
+DELIMITER ;
+
+CALL check_balance(1, @balance);
+SELECT @balance;
+DROP PROCEDURE check_balance;
